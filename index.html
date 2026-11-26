@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f766e">
+<meta name="description" content="SellFlow - Gestion simple des ventes et du stock">
+<link rel="manifest" href="manifest.webmanifest">
+<title>SellFlow — Gestion des ventes</title>
+<style>
+:root{--green:#0f766e;--green2:#14b8a6;--bg:#f3f7f6;--ink:#172b2a;--muted:#71817f;--line:#e3ecea;--white:#fff;--red:#dc2626}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,#115e59,#0f766e);color:white;padding:22px 18px 26px}
+.top{max-width:1050px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:850;font-size:23px;letter-spacing:-.7px}.brand span{color:#99f6e4}
+.tag{font-size:12px;color:#ccfbf1;margin-top:3px}
+main{max-width:1050px;margin:-12px auto 90px;padding:0 14px}
+.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 5px 20px #1232;margin-bottom:14px}
+.welcome{display:flex;justify-content:space-between;align-items:center;gap:12px}.welcome h1{font-size:21px;margin:0 0 4px}.muted{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:14px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:7px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:5px 0 12px}.section-head h2{font-size:17px;margin:0}
+button,.btn{border:0;border-radius:10px;background:var(--green);color:white;padding:11px 14px;font-weight:700;font-size:14px;cursor:pointer}
+button.secondary{background:#e7f4f2;color:#115e59}button.ghost{background:#f1f5f4;color:#334}button.danger{background:#fee2e2;color:#991b1b}
+input,select{width:100%;padding:12px;border:1px solid #d6e2df;border-radius:10px;background:white;font:inherit;margin-top:5px;color:var(--ink)}
+label{font-size:13px;font-weight:650;display:block;margin:10px 0;color:#415451}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5;padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom))}
+.navinner{width:min(700px,100%);display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.navbtn{background:transparent;color:#71817f;padding:8px 3px;font-size:11px;border-radius:10px}.navbtn b{display:block;font-size:19px;margin-bottom:2px}.navbtn.active{background:#e7f4f2;color:var(--green)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.item strong{display:block}.item small{color:var(--muted)}
+.pill{font-size:11px;padding:5px 8px;border-radius:20px;background:#e7f4f2;color:#0f766e;white-space:nowrap}
+.empty{text-align:center;padding:25px 10px;color:var(--muted)}
+.hidden{display:none!important}.actions{display:flex;gap:7px;flex-wrap:wrap}
+dialog{border:0;border-radius:18px;padding:0;width:min(460px,calc(100% - 26px));box-shadow:0 20px 70px #0004}dialog::backdrop{background:#102b2a88}.modal{padding:18px}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h3{margin:0}.close{background:#eef3f2;color:#334;padding:7px 10px}
+.notice{background:#fff7df;border:1px solid #f5e2a8;color:#765a12;border-radius:12px;padding:11px;font-size:12px;margin-top:12px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}main{padding:0 22px}.panel{padding:20px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="brand">Sell<span>Flow</span></div><div class="tag">Gère tes ventes simplement</div></div><div style="font-size:12px">🇸🇳 Sénégal</div></div></header>
+<main>
+<section id="dashboard">
+ <div class="panel welcome"><div><h1>Bonjour 👋</h1><div class="muted">Voici le résumé de ton activité.</div></div><button onclick="openModal('order')">＋ Vente</button></div>
+ <div class="stats">
+  <div class="stat"><small>Chiffre d'affaires</small><strong id="revenue">0 F</strong></div>
+  <div class="stat"><small>Bénéfice estimé</small><strong id="profit">0 F</strong></div>
+  <div class="stat"><small>Commandes</small><strong id="ordersCount">0</strong></div>
+  <div class="stat"><small>Produits</small><strong id="productsCount">0</strong></div>
+ </div>
+ <div class="panel"><div class="section-head"><h2>Dernières ventes</h2><button class="secondary" onclick="showTab('orders')">Tout voir</button></div><div id="recentOrders"></div></div>
+ <div class="notice">Version de démarrage : tes informations sont enregistrées sur cet appareil. Fais régulièrement une sauvegarde en exportant tes données lorsque cette fonction sera ajoutée.</div>
+</section>
+<section id="products" class="hidden">
+ <div class="panel"><div class="section-head"><h2>Mes produits</h2><button onclick="openModal('product')">＋ Ajouter</button></div><div id="productsList"></div></div>
+</section>
+<section id="orders" class="hidden">
+ <div class="panel"><div class="section-head"><h2>Mes ventes</h2><button onclick="openModal('order')">＋ Nouvelle vente</button></div><div id="ordersList"></div></div>
+</section>
+<section id="customers" class="hidden">
+ <div class="panel"><div class="section-head"><h2>Mes clients</h2><button onclick="openModal('customer')">＋ Ajouter</button></div><div id="customersList"></div></div>
+</section>
+</main>
+<nav><div class="navinner">
+ <button class="navbtn active" data-tab="dashboard" onclick="showTab('dashboard')"><b>⌂</b>Accueil</button>
+ <button class="navbtn" data-tab="products" onclick="showTab('products')"><b>▦</b>Produits</button>
+ <button class="navbtn" data-tab="orders" onclick="showTab('orders')"><b>🧾</b>Ventes</button>
+ <button class="navbtn" data-tab="customers" onclick="showTab('customers')"><b>♙</b>Clients</button>
+</div></nav>
+<dialog id="modal"><div class="modal"><div class="modalhead"><h3 id="modalTitle">Ajouter</h3><button class="close" onclick="closeModal()">✕</button></div><form id="form" onsubmit="saveForm(event)"><div id="formFields"></div><button style="width:100%;margin-top:14px" type="submit">Enregistrer</button></form></div></dialog>
+<script>
+const KEY='sellflow_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'{"products":[],"orders":[],"customers":[]}');
+let currentType='';
+const money=n=>new Intl.NumberFormat('fr-FR').format(Number(n)||0)+' F CFA';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function showTab(tab){document.querySelectorAll('main section').forEach(x=>x.classList.add('hidden'));document.getElementById(tab).classList.remove('hidden');document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));}
+function openModal(type){currentType=type;let fields='',title='';
+if(type==='product'){title='Ajouter un produit';fields=`<label>Nom du produit<input name="name" required placeholder="Ex. Jus de bissap"></label><div class="grid2"><label>Prix de vente (F CFA)<input name="price" type="number" min="0" required></label><label>Prix d'achat (F CFA)<input name="cost" type="number" min="0" value="0"></label></div><label>Quantité en stock<input name="stock" type="number" min="0" value="0"></label>`}
+if(type==='customer'){title='Ajouter un client';fields=`<label>Nom du client<input name="name" required placeholder="Nom complet"></label><label>Téléphone WhatsApp<input name="phone" placeholder="Ex. 77 000 00 00"></label>`}
+if(type==='order'){title='Enregistrer une vente';if(!data.products.length){alert('Ajoute d’abord un produit.');return}fields=`<label>Produit<select name="productId" required>${data.products.map(p=>`<option value="${p.id}">${esc(p.name)} — ${money(p.price)} (stock ${p.stock})</option>`).join('')}</select></label><div class="grid2"><label>Quantité<input name="qty" type="number" min="1" value="1" required></label><label>Client<select name="customerId"><option value="">Client de passage</option>${data.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label></div><label>Mode de paiement<select name="payment"><option>Espèces</option><option>Wave</option><option>Orange Money</option><option>Autre</option></select></label>`}
+document.getElementById('modalTitle').textContent=title;document.getElementById('formFields').innerHTML=fields;document.getElementById('modal').showModal()}
+function closeModal(){document.getElementById('modal').close()}
+function saveForm(e){e.preventDefault();const f=new FormData(e.target);const id=Date.now();
+if(currentType==='product')data.products.push({id,name:f.get('name').trim(),price:+f.get('price'),cost:+f.get('cost'),stock:+f.get('stock')});
+if(currentType==='customer')data.customers.push({id,name:f.get('name').trim(),phone:f.get('phone').trim()});
+if(currentType==='order'){const p=data.products.find(x=>x.id===+f.get('productId'));const qty=+f.get('qty');if(qty>p.stock){alert('Stock insuffisant.');return}p.stock-=qty;data.orders.unshift({id,productId:p.id,product:p.name,qty,total:p.price*qty,cost:p.cost*qty,customerId:+f.get('customerId')||null,payment:f.get('payment'),date:new Date().toISOString()})}
+closeModal();e.target.reset();persist()}
+function render(){const revenue=data.orders.reduce((a,o)=>a+o.total,0),profit=data.orders.reduce((a,o)=>a+o.total-o.cost,0);
+document.getElementById('revenue').textContent=money(revenue);document.getElementById('profit').textContent=money(profit);document.getElementById('ordersCount').textContent=data.orders.length;document.getElementById('productsCount').textContent=data.products.length;
+document.getElementById('productsList').innerHTML=data.products.length?data.products.map(p=>`<div class="item"><div><strong>${esc(p.name)}</strong><small>${money(p.price)} · Achat ${money(p.cost)}</small></div><span class="pill">Stock : ${p.stock}</span></div>`).join(''):'<div class="empty">Aucun produit. Ajoute ton premier article.</div>';
+const orderHTML=o=>`<div class="item"><div><strong>${esc(o.product)} × ${o.qty}</strong><small>${new Date(o.date).toLocaleDateString('fr-FR')} · ${esc(o.payment)}</small></div><strong>${money(o.total)}</strong></div>`;
+document.getElementById('ordersList').innerHTML=data.orders.length?data.orders.map(orderHTML).join(''):'<div class="empty">Aucune vente enregistrée.</div>';
+document.getElementById('recentOrders').innerHTML=data.orders.length?data.orders.slice(0,4).map(orderHTML).join(''):'<div class="empty">Tes ventes apparaîtront ici.</div>';
+document.getElementById('customersList').innerHTML=data.customers.length?data.customers.map(c=>`<div class="item"><div><strong>${esc(c.name)}</strong><small>${esc(c.phone||'Pas de téléphone')}</small></div>${c.phone?`<button class="secondary" onclick="whatsapp('${encodeURIComponent(c.phone)}','${encodeURIComponent(c.name)}')">WhatsApp</button>`:''}</div>`).join(''):'<div class="empty">Aucun client enregistré.</div>';
+}
+function whatsapp(phone,name){window.open('https://wa.me/'+decodeURIComponent(phone).replace(/\D/g,'')+'?text='+encodeURIComponent('Bonjour '+decodeURIComponent(name)+', merci pour votre confiance !'),'_blank')}
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>

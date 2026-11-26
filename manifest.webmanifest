@@ -1,0 +1,9 @@
+{
+  "name": "SellFlow - Gestion des ventes",
+  "short_name": "SellFlow",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f7f6",
+  "theme_color": "#0f766e",
+  "description": "Gère tes ventes, produits, stocks et clients."
+}
